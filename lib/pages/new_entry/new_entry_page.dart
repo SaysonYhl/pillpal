@@ -47,6 +47,7 @@ class _NewEntryPageState extends State<NewEntryPage> {
     _newEntryBloc = NewEntryBloc();
     _scaffoldKey = GlobalKey<ScaffoldState>();
     initializeErrorListen();
+    initializeNotifications();
   }
 
   @override
@@ -325,9 +326,9 @@ class _NewEntryPageState extends State<NewEntryPage> {
     return ids;
   }
 
-  initalizeNotifications() async {
+  initializeNotifications() async {
     var initializationSettingsAndroid =
-        const AndroidInitializationSettings('@mipmap/ic_launcher.png');
+        const AndroidInitializationSettings('@drawable/logo');
 
     var initializationSettingsIOS = const DarwinInitializationSettings();
     var initializationSettings = InitializationSettings(
@@ -370,24 +371,33 @@ class _NewEntryPageState extends State<NewEntryPage> {
     for (int i = 0; i < (24 / medicine.interval!).floor(); i++) {
       int currentHour = (hour + (medicine.interval! * i)) % 24;
 
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        int.parse(medicine.notificationIDs![i]), 
-        'Reminder: ${medicine.medicineName}', 
-        medicine.medicineType!.toString() != MedicineType.None.toString() ?
-        'It is time to take your ${medicine.medicineType!.toLowerCase()}' :
-        'It is time to take your medicine', 
-        _nextInstanceOfTime(currentHour, minute),
-        platformChannelSpecifics,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-      );
+      if (medicine.notificationIDs != null &&
+          medicine.notificationIDs!.isNotEmpty) {
+        for (int i = 0; i < medicine.notificationIDs!.length; i++) {
+          await flutterLocalNotificationsPlugin.zonedSchedule(
+            int.parse(medicine.notificationIDs![i]),
+            'Reminder: ${medicine.medicineName}',
+            medicine.medicineType!.toString() != MedicineType.None.toString()
+                ? 'It is time to take your ${medicine.medicineType!.toLowerCase()}'
+                : 'It is time to take your medicine',
+            _nextInstanceOfTime(currentHour, minute),
+            platformChannelSpecifics,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.wallClockTime,
+            matchDateTimeComponents: DateTimeComponents.time,
+          );
+        }
+      } else {
+        print('Notification IDs list is empty or null.');
+      }
     }
   }
 
   tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }

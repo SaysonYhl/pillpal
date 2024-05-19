@@ -27,7 +27,7 @@ void main() async {
 
   // Initialize local notifications plugin
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  var initializationSettingsAndroid = const AndroidInitializationSettings('app_icon');
+  var initializationSettingsAndroid = const AndroidInitializationSettings('@drawable/logo');
   var initializationSettingsIOS = const DarwinInitializationSettings();
   var initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
@@ -149,7 +149,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
 
-          home: const SplashScreen(),
+          home: const HomePage(),
         );
       }),
     );
