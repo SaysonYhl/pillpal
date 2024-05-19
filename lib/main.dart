@@ -1,6 +1,7 @@
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:pillpal/constants.dart';
 import 'package:pillpal/firebase_options.dart';
 import 'package:pillpal/global_bloc.dart';
@@ -11,13 +12,30 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import "package:google_fonts/google_fonts.dart";
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  tz.initializeTimeZones();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Initialize time zones
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Manila'));
+
+  // Initialize local notifications plugin
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  var initializationSettingsAndroid = const AndroidInitializationSettings('app_icon');
+  var initializationSettingsIOS = const DarwinInitializationSettings();
+  var initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsIOS,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
   runApp(const MyApp());
 }
 

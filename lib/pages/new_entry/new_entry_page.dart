@@ -7,11 +7,13 @@ import "package:pillpal/global_bloc.dart";
 import "package:pillpal/models/errors.dart";
 import "package:pillpal/models/medicine.dart";
 import "package:pillpal/models/medicine_type.dart";
+import "package:pillpal/pages/home_page.dart";
 import "package:pillpal/pages/new_entry/new_entry_bloc.dart";
 import "package:pillpal/pages/new_entry/success_screen/success_screen.dart";
 import "package:provider/provider.dart";
 import "package:sizer/sizer.dart";
-import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz;
+import "package:timezone/timezone.dart" as tz;
 
 class NewEntryPage extends StatefulWidget {
   const NewEntryPage({super.key});
@@ -44,7 +46,6 @@ class _NewEntryPageState extends State<NewEntryPage> {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     _newEntryBloc = NewEntryBloc();
     _scaffoldKey = GlobalKey<ScaffoldState>();
-    //initializeNotification();
     initializeErrorListen();
   }
 
@@ -52,7 +53,7 @@ class _NewEntryPageState extends State<NewEntryPage> {
   Widget build(BuildContext context) {
     final GlobalBloc globalBloc = Provider.of<GlobalBloc>(context);
     final FlutterLocalNotificationsPlugin notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+        FlutterLocalNotificationsPlugin();
 
     return Scaffold(
       key: _scaffoldKey,
@@ -254,7 +255,7 @@ class _NewEntryPageState extends State<NewEntryPage> {
                       globalBloc.updateMedicineList(newEntryMedicine);
 
                       //schedule notification
-                      //scheduleNotification(newEntryMedicine);
+                      scheduleNotification(newEntryMedicine);
 
                       //go to success screen
                       Navigator.pushReplacement(
@@ -324,16 +325,75 @@ class _NewEntryPageState extends State<NewEntryPage> {
     return ids;
   }
 
-    //  await flutterLocalNotificationsPlugin.zonedSchedule(
-    //    int.parse(medicine.notificationIDs![i]),
-    //    'Reminder: ${medicine.medicineName}',
-    //    medicine.medicineType.toString() != MedicineType.None.toString()
-    //        ? 'It is time to take your ${medicine.medicineType!.toLowerCase()}'
-    //        : 'It is time to take your med',
-    //    _nextInstanceOfTime(currentHour, minute),
+  initalizeNotifications() async {
+    var initializationSettingsAndroid =
+        const AndroidInitializationSettings('@mipmap/ic_launcher.png');
 
+    var initializationSettingsIOS = const DarwinInitializationSettings();
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+
+  Future onSelectNotification(String? payload) async {
+    if (payload != null) {
+      debugPrint('notification payload: $payload');
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+    );
+  }
+
+  Future<void> scheduleNotification(Medicine medicine) async {
+    var hour = int.parse(medicine.startTime![0] + medicine.startTime![1]);
+    var minute = int.parse(medicine.startTime![2] + medicine.startTime![3]);
+
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+      'repeatDailyAtTime channel id', //notif channel id
+      'repeatDailyAtTime chennel name', //notif channel name
+      importance: Importance.max,
+      ledColor: kPrimaryColor,
+      ledOffMs: 1000,
+      ledOnMs: 1000,
+      enableLights: true,
+    );
+
+    var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
+
+    var platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+      iOS: iOSPlatformChannelSpecifics,
+    );
+
+    for (int i = 0; i < (24 / medicine.interval!).floor(); i++) {
+      int currentHour = (hour + (medicine.interval! * i)) % 24;
+
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        int.parse(medicine.notificationIDs![i]), 
+        'Reminder: ${medicine.medicineName}', 
+        medicine.medicineType!.toString() != MedicineType.None.toString() ?
+        'It is time to take your ${medicine.medicineType!.toLowerCase()}' :
+        'It is time to take your medicine', 
+        _nextInstanceOfTime(currentHour, minute),
+        platformChannelSpecifics,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.wallClockTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+      );
+    }
+  }
+
+  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    if (scheduledDate.isBefore(now)) {
+      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    }
+    return scheduledDate;
+  }
 }
-
 
 class SelectTime extends StatefulWidget {
   const SelectTime({super.key});
