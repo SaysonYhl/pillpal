@@ -25,7 +25,7 @@ class GlobalBloc {
 
         //TODO: remove notifications
         for(int i = 0; 1 < (24 / toBeRemoved.interval!).floor(); i++) {
-          flutterLocalNotificationsPlugin.cancel(toBeRemoved.notificationIDs![i]);
+          flutterLocalNotificationsPlugin.cancel(int.parse(toBeRemoved.notificationIDs![i]));
         }
 
         if(blocList.isNotEmpty) {
