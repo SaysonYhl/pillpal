@@ -167,7 +167,7 @@ class _LoginState extends State<Login> {
                         style: TextStyle(color: Colors.white),
                       ),
                       TextButton(
-                        onPressed: () => AuthService().signInWithGoogle(),
+                        onPressed: () => AuthService().signInWithGoogle(context),
                         child: Image.asset(
                           'assets/images/googleicon.png',
                           height: 40.0,
