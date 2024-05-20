@@ -1,9 +1,12 @@
 import "dart:math";
 import "package:flutter/material.dart";
+import "package:flutter/services.dart";
 import "package:flutter_local_notifications/flutter_local_notifications.dart";
+import "package:permission_handler/permission_handler.dart";
 import "package:pillpal/common/convert_time.dart";
 import "package:pillpal/constants.dart";
 import "package:pillpal/global_bloc.dart";
+import "package:pillpal/main.dart";
 import "package:pillpal/models/errors.dart";
 import "package:pillpal/models/medicine.dart";
 import "package:pillpal/models/medicine_type.dart";
@@ -53,7 +56,7 @@ class _NewEntryPageState extends State<NewEntryPage> {
   @override
   Widget build(BuildContext context) {
     final GlobalBloc globalBloc = Provider.of<GlobalBloc>(context);
-    final FlutterLocalNotificationsPlugin notificationsPlugin =
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
 
     return Scaffold(
@@ -168,12 +171,15 @@ class _NewEntryPageState extends State<NewEntryPage> {
                   },
                 ),
               ),
+              SizedBox(
+                height: 5.h,
+              ),
               const PanelTitle(title: 'Interval Selection', isRequired: true),
               const IntervalSelection(),
               const PanelTitle(title: 'Starting Time', isRequired: true),
               const SelectTime(),
               SizedBox(
-                height: 2.h,
+                height: 5.h,
               ),
               Padding(
                 padding: EdgeInsets.only(
@@ -196,7 +202,7 @@ class _NewEntryPageState extends State<NewEntryPage> {
                             ),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       String? medicineName;
                       int? dosage;
                       //med name
@@ -255,6 +261,9 @@ class _NewEntryPageState extends State<NewEntryPage> {
                       //update medicine list via global bloc
                       globalBloc.updateMedicineList(newEntryMedicine);
 
+                      //request permission
+                      await requestExactAlarmPermission();
+
                       //schedule notification
                       scheduleNotification(newEntryMedicine);
 
@@ -304,6 +313,20 @@ class _NewEntryPageState extends State<NewEntryPage> {
     });
   }
 
+  Future<void> requestExactAlarmPermission() async {
+    try {
+      final bool result = await MyApp.platform.invokeMethod('requestExactAlarmPermission');
+      if (result) {
+        print('Exact alarms permission granted');
+      } else {
+        print('Exact alarms permission denied, opening settings');
+        openAppSettings();
+      }
+    } on PlatformException catch (e) {
+      print('Failed to request exact alarms permission: ${e.message}');
+    }
+  }
+
   void displayError(String error) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -317,91 +340,93 @@ class _NewEntryPageState extends State<NewEntryPage> {
     );
   }
 
-  List<int> makeIDs(double n) {
-    var rng = Random();
-    List<int> ids = [];
-    for (int i = 1; i < n; i++) {
-      ids.add(rng.nextInt(1000000000));
-    }
-    return ids;
-  }
-
-  initializeNotifications() async {
-    var initializationSettingsAndroid =
-        const AndroidInitializationSettings('@drawable/logo');
-
-    var initializationSettingsIOS = const DarwinInitializationSettings();
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
-
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
-  Future onSelectNotification(String? payload) async {
-    if (payload != null) {
-      debugPrint('notification payload: $payload');
-    }
-    await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HomePage()),
-    );
-  }
-
-  Future<void> scheduleNotification(Medicine medicine) async {
-    var hour = int.parse(medicine.startTime![0] + medicine.startTime![1]);
-    var minute = int.parse(medicine.startTime![2] + medicine.startTime![3]);
-
-    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
-      'repeatDailyAtTime channel id', //notif channel id
-      'repeatDailyAtTime chennel name', //notif channel name
-      importance: Importance.max,
-      ledColor: kPrimaryColor,
-      ledOffMs: 1000,
-      ledOnMs: 1000,
-      enableLights: true,
-    );
-
-    var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
-
-    var platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
-    );
-
-    for (int i = 0; i < (24 / medicine.interval!).floor(); i++) {
-      int currentHour = (hour + (medicine.interval! * i)) % 24;
-
-      if (medicine.notificationIDs != null &&
-          medicine.notificationIDs!.isNotEmpty) {
-        for (int i = 0; i < medicine.notificationIDs!.length; i++) {
-          await flutterLocalNotificationsPlugin.zonedSchedule(
-            int.parse(medicine.notificationIDs![i]),
-            'Reminder: ${medicine.medicineName}',
-            medicine.medicineType!.toString() != MedicineType.None.toString()
-                ? 'It is time to take your ${medicine.medicineType!.toLowerCase()}'
-                : 'It is time to take your medicine',
-            _nextInstanceOfTime(currentHour, minute),
-            platformChannelSpecifics,
-            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-            uiLocalNotificationDateInterpretation:
-                UILocalNotificationDateInterpretation.wallClockTime,
-            matchDateTimeComponents: DateTimeComponents.time,
-          );
-        }
-      } else {
-        print('Notification IDs list is empty or null.');
+    List<int> makeIDs(double n) {
+      var rng = Random();
+      List<int> ids = [];
+      for (int i = 1; i < n; i++) {
+        ids.add(rng.nextInt(1000000000));
       }
+      return ids;
     }
-  }
 
-  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
-    if (scheduledDate.isBefore(now)) {
-      scheduledDate = scheduledDate.add(const Duration(days: 1));
+    initializeNotifications() async {
+      var initializationSettingsAndroid =
+          const AndroidInitializationSettings('@drawable/logo');
+
+      var initializationSettingsIOS = const DarwinInitializationSettings();
+      var initializationSettings = InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS);
+
+      await flutterLocalNotificationsPlugin.initialize(initializationSettings);
     }
-    return scheduledDate;
+
+    Future onSelectNotification(String? payload) async {
+      if (payload != null) {
+        debugPrint('notification payload: $payload');
+      }
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    }
+
+    Future<void> scheduleNotification(Medicine medicine) async {
+      var hour = int.parse(medicine.startTime![0] + medicine.startTime![1]);
+      var minute = int.parse(medicine.startTime![2] + medicine.startTime![3]);
+
+      var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
+        'repeatDailyAtTime channel id', //notif channel id
+        'repeatDailyAtTime chennel name', //notif channel name
+        importance: Importance.max,
+        ledColor: kPrimaryColor,
+        ledOffMs: 1000,
+        ledOnMs: 1000,
+        enableLights: true,
+      );
+
+      var iOSPlatformChannelSpecifics = const DarwinNotificationDetails();
+
+      var platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iOSPlatformChannelSpecifics,
+      );
+
+      tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
+      final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+      tz.TZDateTime scheduledDate =
+          tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+      if (scheduledDate.isBefore(now)) {
+        scheduledDate = scheduledDate.add(const Duration(days: 1));
+      }
+      return scheduledDate;
+    }
+
+      for (int i = 0; i < (24 / medicine.interval!).floor(); i++) {
+        int currentHour = (hour + (medicine.interval! * i)) % 24;
+
+        // if (medicine.notificationIDs != null &&
+        // medicine.notificationIDs!.isNotEmpty) {
+          for (int i = 0; i < medicine.notificationIDs!.length; i++) {
+            await flutterLocalNotificationsPlugin.zonedSchedule(
+              int.parse(medicine.notificationIDs![i]),
+              'Reminder: ${medicine.medicineName}',
+              medicine.medicineType!.toString() != MedicineType.None.toString()
+                  ? 'It is time to take your ${medicine.medicineType!.toLowerCase()}'
+                  : 'It is time to take your medicine',
+              _nextInstanceOfTime(currentHour, minute),
+              platformChannelSpecifics,
+              androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+              uiLocalNotificationDateInterpretation:
+                  UILocalNotificationDateInterpretation.wallClockTime,
+              matchDateTimeComponents: DateTimeComponents.time,
+            );
+          }
+        // } else {
+        //   print('Notification IDs list is empty or null.');
+        // }
+      }
+    
   }
 }
 

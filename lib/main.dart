@@ -13,6 +13,7 @@ import 'package:sizer/sizer.dart';
 import "package:google_fonts/google_fonts.dart";
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter/services.dart';
 
 
 void main() async {
@@ -41,6 +42,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
+  static const platform = MethodChannel('com.example.pillpal/exact_alarm');
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -149,7 +151,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
 
-          home: const HomePage(),
+          home: const SplashScreen(),
         );
       }),
     );
