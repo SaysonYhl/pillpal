@@ -5,9 +5,8 @@ import "package:pillpal/constants.dart";
 import "package:pillpal/pages/home_page.dart";
 import "package:google_sign_in/google_sign_in.dart";
 import "package:firebase_auth/firebase_auth.dart";
-import "package:pillpal/user_auth/firebase_auth_services.dart";
+import "package:pillpal/user_auth/auth_service.dart";
 import "package:pillpal/welcome_screens/signup.dart";
-import "package:sign_in_button/sign_in_button.dart";
 import "package:sizer/sizer.dart";
 
 class Login extends StatefulWidget {
@@ -20,19 +19,6 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  User? _user;
-
-  @override
-  void initState() {
-    super.initState();
-    _auth.authStateChanges().listen((event) {
-      setState(() {
-        _user = event;
-      });
-    });
-  }
 
   void signIn() async {
     showDialog(
@@ -99,7 +85,6 @@ class _LoginState extends State<Login> {
               ),
             ),
             child: Center(
-              //child: Expanded(
               child: Column(
                 children: [
                   SizedBox(
@@ -173,10 +158,27 @@ class _LoginState extends State<Login> {
                   const SizedBox(
                     height: 10,
                   ),
-                  //_user != null ? _userInfo() : 
-                  _googleSignInButton(),
+                  //google sign in
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Sign in using ',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      TextButton(
+                        onPressed: () => AuthService().signInWithGoogle(),
+                        child: Image.asset(
+                          'assets/images/googleicon.png',
+                          height: 40.0,
+                          width: 40.0,
+                        ),
+                      ),
+                    ],
+                  ),
+
                   const SizedBox(
-                    height: 20,
+                    height: 30,
                   ),
                   signUpOption(),
                 ],
@@ -186,59 +188,6 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
-  }
-
-  Widget _googleSignInButton() {
-    return SizedBox(
-      height: 40,
-      width: 200,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(30),
-          child: SignInButton(
-            Buttons.google,
-            text: 'Sign in using Google',
-            onPressed: _handleGoogleSignIn,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Widget _userInfo() {
-  //   return Container(
-  //     height: 20.w,
-  //     width: 20.w,
-  //     decoration: BoxDecoration(
-  //         image: DecorationImage(image: NetworkImage(_user!.photoURL!),
-  //         ),
-  //         ),
-  //         child: Text(_user!.email!),
-  //   );
-  // }
-
-  void _handleGoogleSignIn() async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
-    try {
-      GoogleAuthProvider _googleAuthProvider = GoogleAuthProvider();
-      await _auth.signInWithProvider(_googleAuthProvider);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-    } catch (error) {
-      Navigator.pop(context);
-      print(error);
-    }
   }
 
   Row signUpOption() {
@@ -251,8 +200,8 @@ class _LoginState extends State<Login> {
         ),
         GestureDetector(
           onTap: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => const SignUp()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const SignUp()));
           },
           child: const Text(
             'Sign Up',

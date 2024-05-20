@@ -80,97 +80,103 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Sign Up',
-          style: TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: const Text(
+            'Sign Up',
+            style: TextStyle(
+                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color.fromARGB(255, 14, 128, 75),
-                Color.fromARGB(255, 4, 110, 61),
-                Color.fromARGB(255, 1, 69, 37),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: Colors.white,
             ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
           ),
-          child: Center(
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 70,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Email',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 15,
-                          color: Colors.white,
-                        )),
-                    SizedBox(
-                      height: 0.5.h,
-                    ),
-                    reusableTextField(
-                        Icons.mail_outline, false, emailController, 400, 50),
-                    SizedBox(
-                      height: 2.h,
-                    ),
-                    const Text('Password',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 15,
-                          color: Colors.white,
-                        )),
-                    SizedBox(
-                      height: 0.5.h,
-                    ),
-                    reusableTextField(
-                        Icons.lock_outline, true, passwordController, 400, 50),
-                    SizedBox(
-                      height: 2.h,
-                    ),
-                    const Text('Confirm Password',
-                        style: TextStyle(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 15,
-                          color: Colors.white,
-                        )),
-                    SizedBox(
-                      height: 0.5.h,
-                    ),
-                    reusableTextField(Icons.lock_outline, true,
-                        confirmPasswordController, 400, 50),
-                    SizedBox(
-                      height: 3.h,
-                    ),
-                  ],
-                ),
-                signInSignUpButton(context, false, () {
-                  signUp();
-                }),
-              ],
+        ),
+        body: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 14, 128, 75),
+                  Color.fromARGB(255, 4, 110, 61),
+                  Color.fromARGB(255, 1, 69, 37),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: Center(
+              child: Column(
+                children: [
+                  const SizedBox(height: 70),
+                  SizedBox(
+                    height: 30.h,
+                    width: 60.w,
+                    child: Image.asset('assets/images/whitelogowtext.png'),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Email',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 15,
+                            color: Colors.white,
+                          )),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      reusableTextField(
+                          Icons.mail_outline, false, emailController, 400, 50),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      const Text('Password',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 15,
+                            color: Colors.white,
+                          )),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      reusableTextField(
+                          Icons.lock_outline, true, passwordController, 400, 50),
+                      SizedBox(
+                        height: 15,
+                      ),
+                      const Text('Confirm Password',
+                          style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 15,
+                            color: Colors.white,
+                          )),
+                      const SizedBox(
+                        height: 8,
+                      ),
+                      reusableTextField(Icons.lock_outline, true,
+                          confirmPasswordController, 400, 50),
+                      SizedBox(
+                        height: 3.h,
+                      ),
+                    ],
+                  ),
+                  signInSignUpButton(context, false, () {
+                    signUp();
+                  }),
+                ],
+              ),
             ),
           ),
         ),
