@@ -1,11 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pillpal/constants.dart';
 import 'package:pillpal/global_bloc.dart';
 import 'package:pillpal/models/medicine.dart';
 import 'package:pillpal/pages/medicine_details/medicine_details.dart';
 import 'package:pillpal/pages/new_entry/new_entry_page.dart';
+import 'package:pillpal/pages/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:pillpal/user_auth/auth_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -19,9 +22,7 @@ class HomePage extends StatelessWidget {
       ),
       extendBodyBehindAppBar: true,
       body: Padding(
-        padding: EdgeInsets.all(
-          2.h,
-        ),
+        padding: EdgeInsets.all(2.h),
         child: Column(
           children: [
             const SizedBox(height: 15),
@@ -33,14 +34,11 @@ class HomePage extends StatelessWidget {
             const Flexible(
               child: BottomContainer(),
             ),
-
-
           ],
         ),
       ),
       floatingActionButton: InkResponse(
         onTap: () {
-          //go to new entry page
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -66,22 +64,26 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class TopContainer extends StatefulWidget {
+class TopContainer extends StatelessWidget {
   const TopContainer({super.key});
 
   @override
-  State<TopContainer> createState() => _TopContainerState();
-}
-
-class _TopContainerState extends State<TopContainer> {
-
-  @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
+    String profilePhoto;
+    if (user != null) {
+      profilePhoto = user.photoURL!.toString();
+    } else {
+      profilePhoto = 'https://images.app.goo.gl/LEQrX3wnxp2FrQny8';
+    }
     return Row(
       children: [
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            SizedBox(
+              height: 5.h,
+            ),
             Container(
               alignment: Alignment.topLeft,
               padding: EdgeInsets.only(
@@ -108,15 +110,37 @@ class _TopContainerState extends State<TopContainer> {
             ),
           ],
         ),
-        SizedBox(width: 20.w,),
+        SizedBox(
+          width: 20.w,
+        ),
         Positioned(
           top: 0,
           right: 0,
           child: SizedBox(
-            height: 60.sp,
-            width: 60.sp,
-            child:
-            Image.asset('assets/images/logo.png'),
+            height: 60,
+            width: 60,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: kErrorBorderColor,
+                    width: 1,
+                  ),
+                ),
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(profilePhoto),
+                  backgroundColor: Colors.transparent,
+                  radius: 30,
+                ),
+              ),
+            ),
           ),
         ),
       ],
@@ -129,7 +153,6 @@ class BottomContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final GlobalBloc globalBloc = Provider.of<GlobalBloc>(context);
 
     return StreamBuilder(
@@ -225,21 +248,22 @@ class MedicineCard extends StatelessWidget {
       onTap: () {
         //go to details activity with animation
 
-        Navigator.of(context).push(PageRouteBuilder<void>(pageBuilder:
-            (BuildContext context, Animation<double> animation,
+        Navigator.of(context).push(
+          PageRouteBuilder<void>(
+            pageBuilder: (BuildContext context, Animation<double> animation,
                 Animation<double> secondaryAnimation) {
-          return AnimatedBuilder(
-              animation: animation,
-              builder: (context, Widget? child) {
-                return Opacity(
-                  opacity: animation.value,
-                  child: MedicineDetails(medicine),
-                );
-              },
+              return AnimatedBuilder(
+                animation: animation,
+                builder: (context, Widget? child) {
+                  return Opacity(
+                    opacity: animation.value,
+                    child: MedicineDetails(medicine),
+                  );
+                },
               );
-        },
-        transitionDuration: const Duration(milliseconds: 500),
-        ),
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
         );
       },
       child: Container(
