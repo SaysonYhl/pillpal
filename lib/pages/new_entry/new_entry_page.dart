@@ -1,20 +1,15 @@
 import "dart:math";
 import "package:flutter/material.dart";
-import "package:flutter_local_notifications/flutter_local_notifications.dart";
-import "package:permission_handler/permission_handler.dart";
 import "package:pillpal/common/convert_time.dart";
 import "package:pillpal/constants.dart";
 import "package:pillpal/global_bloc.dart";
 import "package:pillpal/models/errors.dart";
 import "package:pillpal/models/medicine.dart";
 import "package:pillpal/models/medicine_type.dart";
-import "package:pillpal/pages/home_page.dart";
 import "package:pillpal/pages/new_entry/new_entry_bloc.dart";
 import "package:pillpal/pages/new_entry/success_screen/success_screen.dart";
 import "package:provider/provider.dart";
 import "package:sizer/sizer.dart";
-import 'package:timezone/data/latest.dart' as tz;
-import "package:timezone/timezone.dart" as tz;
 
 class NewEntryPage extends StatefulWidget {
   const NewEntryPage({super.key});

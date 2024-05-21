@@ -8,7 +8,6 @@ import 'package:pillpal/pages/new_entry/new_entry_page.dart';
 import 'package:pillpal/pages/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'package:pillpal/user_auth/auth_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -70,12 +69,6 @@ class TopContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     User? user = FirebaseAuth.instance.currentUser;
-    String profilePhoto;
-    if (user != null) {
-      profilePhoto = user.photoURL!.toString();
-    } else {
-      profilePhoto = 'https://images.app.goo.gl/LEQrX3wnxp2FrQny8';
-    }
     return Row(
       children: [
         Column(
@@ -135,7 +128,10 @@ class TopContainer extends StatelessWidget {
                   ),
                 ),
                 child: CircleAvatar(
-                  backgroundImage: NetworkImage(profilePhoto),
+                  backgroundImage: NetworkImage(
+                    user?.photoURL ??
+                        'https://images.app.goo.gl/LEQrX3wnxp2FrQny8',
+                  ),
                   backgroundColor: Colors.transparent,
                   radius: 30,
                 ),

@@ -42,7 +42,7 @@ class _SignUpState extends State<SignUp> {
         Navigator.pop(context);
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => HomePage()),
+          MaterialPageRoute(builder: (context) => const HomePage()),
           (Route<dynamic> route) => false,
         );
       } else {
@@ -70,7 +70,6 @@ class _SignUpState extends State<SignUp> {
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
-                    //fontFamily: 'Raleway',
                     fontWeight: FontWeight.w900,
                   )),
             ),

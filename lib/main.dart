@@ -6,14 +6,11 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:pillpal/constants.dart';
 import 'package:pillpal/firebase_options.dart';
 import 'package:pillpal/global_bloc.dart';
-import 'package:pillpal/pages/home_page.dart';
-import 'package:pillpal/welcome_screens/login.dart';
 import 'package:pillpal/welcome_screens/splashscreen.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import "package:google_fonts/google_fonts.dart";
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/services.dart';
 
 

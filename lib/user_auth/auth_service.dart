@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:pillpal/pages/home_page.dart';
+import 'package:pillpal/welcome_screens/login.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -27,7 +28,6 @@ class AuthService {
       User? user = userCredential.user;
 
       if (user != null) {
-        // Pass photoURL to HomePage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -41,10 +41,15 @@ class AuthService {
     }
   }
 
-  Future<void> signOut() async {
+  Future<void> signOut(BuildContext context) async {
     try {
       await _googleSignIn.signOut();
       await _auth.signOut();
+      Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Login()),
+                    (route) => false,
+                  );
     } catch (e) {
       print(e.toString());
       // Handle error

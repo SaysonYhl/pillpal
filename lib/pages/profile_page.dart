@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:pillpal/constants.dart';
-import 'package:pillpal/pages/home_page.dart';
 import 'package:pillpal/user_auth/auth_service.dart';
-import 'package:pillpal/welcome_screens/login.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+  const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +14,7 @@ class ProfilePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Profile', style: TextStyle(color: Colors.black)),
+        title: const Text('Profile', style: TextStyle(color: Colors.black)),
         centerTitle: true,
       ),
       body: Center(
@@ -41,20 +38,15 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Text(
                 user.email ?? 'No Email',
-                style: TextStyle(fontSize: 18, color: kTextColor),
+                style: const TextStyle(fontSize: 18, color: kTextColor),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
-                  await AuthService().signOut();
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Login()),
-                    (route) => false,
-                  );
+                  await AuthService().signOut(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: kErrorBorderColor,
