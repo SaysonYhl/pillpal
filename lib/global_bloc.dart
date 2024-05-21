@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rxdart/rxdart.dart';
 
 class GlobalBloc {
+
   BehaviorSubject<List<Medicine>>? _medicineList$;
   BehaviorSubject<List<Medicine>>? get medicineList$ => _medicineList$;
 
@@ -12,11 +13,21 @@ class GlobalBloc {
     makeMedicineList();
   }
 
+  Future removeAllMedicines() async {
+  SharedPreferences sharedUser = await SharedPreferences.getInstance();
+
+  await sharedUser.remove('medicines');
+
+  _medicineList$!.add([]);
+}
+
   Future removeMedicine(Medicine toBeRemoved) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     List<String> medicineJsonList = [];
 
     var blocList = medicineList$!.value;
+    blocList.removeWhere(
+        (medicine) => medicine.medicineName == toBeRemoved.medicineName);
 
         if(blocList.isNotEmpty) {
           for(var blocMedicine in blocList) {

@@ -13,11 +13,11 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     Future.delayed(
-      Duration(seconds: 3), (){
-        Navigator.pushReplacement(context, 
+      const Duration(seconds: 3), (){
+        Navigator.pushAndRemoveUntil(context, 
         PageRouteBuilder(
-          transitionDuration: Duration(milliseconds: 1000),
-          pageBuilder: (_, __, ___) => Login(),
+          transitionDuration: const Duration(milliseconds: 1000),
+          pageBuilder: (_, __, ___) => const Login() ,
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(
               opacity: animation,
@@ -25,6 +25,7 @@ class _SplashScreenState extends State<SplashScreen> {
             );
           },
         ),
+        (Route<dynamic> route) => false,
         );
       }
     );

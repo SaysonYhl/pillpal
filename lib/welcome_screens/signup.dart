@@ -1,7 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:pillpal/constants.dart';
-import 'package:pillpal/pages/home_page.dart';
+import 'package:pillpal/user_auth/auth_service.dart';
 import 'package:sizer/sizer.dart';
 
 class SignUp extends StatefulWidget {
@@ -24,59 +22,6 @@ class _SignUpState extends State<SignUp> {
     super.dispose();
   }
 
-  void signUp() async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
-
-    //create account
-    try {
-      //check password-confpass
-      if (passwordController.text == confirmPasswordController.text) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-            email: emailController.text, password: passwordController.text);
-        Navigator.pop(context);
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (Route<dynamic> route) => false,
-        );
-      } else {
-        Navigator.pop(context);
-        showErrorMessage('Password does not match');
-      }
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      showErrorMessage(e.code);
-    }
-    //logout method sa profile
-  }
-
-  void showErrorMessage(String message) {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: kErrorBorderColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(50),
-            ),
-            title: Center(
-              child: Text(message,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  )),
-            ),
-          );
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -92,7 +37,7 @@ class _SignUpState extends State<SignUp> {
           ),
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back,
               color: Colors.white,
             ),
@@ -121,7 +66,7 @@ class _SignUpState extends State<SignUp> {
                   const SizedBox(height: 70),
                   SizedBox(
                     height: 30.h,
-                    width: 60.w,
+                    width: 50.w,
                     child: Image.asset('assets/images/whitelogowtext.png'),
                   ),
                   Column(
@@ -137,8 +82,8 @@ class _SignUpState extends State<SignUp> {
                         height: 8,
                       ),
                       reusableTextField(
-                          Icons.mail_outline, false, emailController, 400, 50),
-                      SizedBox(
+                          Icons.mail_outline, false, emailController, 350, 50),
+                      const SizedBox(
                         height: 15,
                       ),
                       const Text('Password',
@@ -150,9 +95,9 @@ class _SignUpState extends State<SignUp> {
                       const SizedBox(
                         height: 8,
                       ),
-                      reusableTextField(
-                          Icons.lock_outline, true, passwordController, 400, 50),
-                      SizedBox(
+                      reusableTextField(Icons.lock_outline, true,
+                          passwordController, 350, 50),
+                      const SizedBox(
                         height: 15,
                       ),
                       const Text('Confirm Password',
@@ -165,15 +110,18 @@ class _SignUpState extends State<SignUp> {
                         height: 8,
                       ),
                       reusableTextField(Icons.lock_outline, true,
-                          confirmPasswordController, 400, 50),
+                          confirmPasswordController, 350, 50),
                       SizedBox(
                         height: 3.h,
                       ),
                     ],
                   ),
-                  signInSignUpButton(context, false, () {
-                    signUp();
-                  }),
+                  signInSignUpButton(
+                    context,
+                    false,
+                    () => AuthService().signUp(context, emailController,
+                        passwordController, confirmPasswordController),
+                  ),
                 ],
               ),
             ),
@@ -209,50 +157,48 @@ Container reusableTextField(IconData icon, bool isPasswordType,
           color: Colors.white,
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 2),
-          filled: true,
-          fillColor: Colors.white.withOpacity(0.1),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(width: 0, style: BorderStyle.none),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white.withOpacity(0.0),
-            width: 1.5),
-            borderRadius: BorderRadius.circular(30),
-          ),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.1),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(width: 0, style: BorderStyle.none),
         ),
-        keyboardType: isPasswordType
-        ? TextInputType.visiblePassword
-        : TextInputType.emailAddress,
+        focusedBorder: OutlineInputBorder(
+          borderSide:
+              BorderSide(color: Colors.white.withOpacity(0.0), width: 1.5),
+          borderRadius: BorderRadius.circular(30),
+        ),
       ),
-    );
+      keyboardType: isPasswordType
+          ? TextInputType.visiblePassword
+          : TextInputType.emailAddress,
+    ),
+  );
 }
 
-
-Container signInSignUpButton(BuildContext context, bool isLogin, Function onTap){
+Container signInSignUpButton(
+    BuildContext context, bool isLogin, Function onTap) {
   return Container(
     width: 200,
     height: 50,
     margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
     decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
-    child: ElevatedButton(onPressed: (){
-      onTap();
-    },
-     child: Text(
-      isLogin ? 'Sign In' : 'Sign Up',
-      style: const TextStyle(
-        color: Colors.black,
-        fontWeight: FontWeight.bold,
-        fontSize: 16
-      ),
-     ),
-     style: ButtonStyle(
-      backgroundColor: MaterialStateProperty.resolveWith((states) {
+    child: ElevatedButton(
+      onPressed: () {
+        onTap();
+      },
+      style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.pressed)) {
           return Colors.black45;
         }
         return Colors.white;
-      })
-     ),),
+      })),
+      child: Text(
+        isLogin ? 'Sign In' : 'Sign Up',
+        style: const TextStyle(
+            color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+    ),
   );
 }

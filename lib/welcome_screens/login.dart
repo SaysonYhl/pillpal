@@ -1,7 +1,4 @@
 import "package:flutter/material.dart";
-import "package:pillpal/constants.dart";
-import "package:pillpal/pages/home_page.dart";
-import "package:firebase_auth/firebase_auth.dart";
 import "package:pillpal/user_auth/auth_service.dart";
 import "package:pillpal/welcome_screens/signup.dart";
 import "package:sizer/sizer.dart";
@@ -16,52 +13,6 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
-
-  void signIn() async {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: emailController.text, password: passwordController.text);
-      Navigator.pop(context);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
-    } on FirebaseAuthException catch (e) {
-      Navigator.pop(context);
-      showErrorMessage(e.code);
-    }
-  }
-
-  void showErrorMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: kErrorBorderColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
-          ),
-          title: Center(
-            child: Text(
-              message,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +77,8 @@ class _LoginState extends State<Login> {
                     ],
                   ),
                   ElevatedButton(
-                    onPressed: signIn,
+                    onPressed: () => AuthService()
+                        .signIn(context, emailController, passwordController),
                     style: ButtonStyle(
                         backgroundColor:
                             MaterialStateProperty.all<Color>(Colors.white),
@@ -164,7 +116,8 @@ class _LoginState extends State<Login> {
                         style: TextStyle(color: Colors.white),
                       ),
                       TextButton(
-                        onPressed: () => AuthService().signInWithGoogle(context),
+                        onPressed: () =>
+                            AuthService().signInWithGoogle(context),
                         child: Image.asset(
                           'assets/images/googleicon.png',
                           height: 40.0,

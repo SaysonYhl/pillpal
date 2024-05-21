@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pillpal/constants.dart';
 import 'package:pillpal/global_bloc.dart';
@@ -68,7 +67,6 @@ class TopContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    User? user = FirebaseAuth.instance.currentUser;
     return Row(
       children: [
         Column(
@@ -123,17 +121,19 @@ class TopContainer extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: kErrorBorderColor,
+                    color: Colors.white,
                     width: 1,
                   ),
                 ),
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                    user?.photoURL ??
-                        'https://images.app.goo.gl/LEQrX3wnxp2FrQny8',
-                  ),
-                  backgroundColor: Colors.transparent,
+                child: const CircleAvatar(
+                  backgroundColor:
+                      kPrimaryColor,
                   radius: 30,
+                  child: Icon(
+                    Icons.account_circle,
+                    color: Colors.white,
+                    size: 55,
+                  ),
                 ),
               ),
             ),

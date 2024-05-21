@@ -1,8 +1,5 @@
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pillpal/constants.dart';
 import 'package:pillpal/firebase_options.dart';
 import 'package:pillpal/global_bloc.dart';
@@ -13,31 +10,16 @@ import "package:google_fonts/google_fonts.dart";
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:flutter/services.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // Initialize time zones
   tz.initializeTimeZones();
-  //tz.setLocalLocation(tz.getLocation('Asia/Manila'));
-
-  // Initialize local notifications plugin
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  var initializationSettingsAndroid = const AndroidInitializationSettings('@drawable/logo');
-  var initializationSettingsIOS = const DarwinInitializationSettings();
-  var initializationSettings = InitializationSettings(
-    android: initializationSettingsAndroid,
-    iOS: initializationSettingsIOS,
-  );
-
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -48,30 +30,14 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
   GlobalBloc? globalBloc;
 
   @override
   void initState() {
     super.initState();
     globalBloc = GlobalBloc();
-    requestExactAlarmPermission();
   }
 
-  Future<void> requestExactAlarmPermission() async {
-    if (await Permission.systemAlertWindow.isDenied) {
-      final status = await Permission.systemAlertWindow.request();
-      if (status.isGranted) {
-        print('Exact alarms permission granted');
-      } else {
-        print('Exact alarms permission denied, opening settings');
-        openAppSettings();
-      }
-    } else if (await Permission.systemAlertWindow.isPermanentlyDenied) {
-      print('Exact alarms permission permanently denied, opening settings');
-      openAppSettings();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
