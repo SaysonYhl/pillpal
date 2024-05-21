@@ -17,6 +17,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        automaticallyImplyLeading: false,
       ),
       extendBodyBehindAppBar: true,
       body: Padding(
@@ -107,33 +108,44 @@ class TopContainer extends StatelessWidget {
         Positioned(
           top: 0,
           right: 0,
-          child: SizedBox(
-            height: 60,
-            width: 60,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                );
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white,
-                    width: 1,
-                  ),
+          child: InkWell(
+            highlightColor: Colors.white,
+            splashColor: kScaffoldColor,
+            onTap: () {
+              Navigator.of(context).push(
+                PageRouteBuilder<void>(
+                  pageBuilder: (BuildContext context,
+                      Animation<double> animation,
+                      Animation<double> secondaryAnimation) {
+                    return AnimatedBuilder(
+                      animation: animation,
+                      builder: (context, Widget? child) {
+                        return Opacity(
+                          opacity: animation.value,
+                          child: const ProfilePage(),
+                        );
+                      },
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 500),
                 ),
-                child: const CircleAvatar(
-                  backgroundColor:
-                      kPrimaryColor,
-                  radius: 30,
-                  child: Icon(
-                    Icons.account_circle,
-                    color: Colors.white,
-                    size: 55,
-                  ),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: kScaffoldColor,
+                  width: 1,
+                ),
+              ),
+              child: const CircleAvatar(
+                backgroundColor: kScaffoldColor,
+                radius: 35,
+                child: Icon(
+                  Icons.account_circle,
+                  color: kPrimaryColor,
+                  size: 73,
                 ),
               ),
             ),

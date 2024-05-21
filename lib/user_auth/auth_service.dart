@@ -61,9 +61,9 @@ class AuthService {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
       Navigator.pop(context);
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()), (route) => false,
       );
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
@@ -116,9 +116,9 @@ class AuthService {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: emailController.text, password: passwordController.text);
         Navigator.pop(context);
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const Login()),
+          MaterialPageRoute(builder: (context) => const Login()), (route) => false,
         );
       } else {
         Navigator.pop(context);

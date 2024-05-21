@@ -168,7 +168,7 @@ class _NewEntryPageState extends State<NewEntryPage> {
               const PanelTitle(title: 'Starting Time', isRequired: true),
               const SelectTime(),
               SizedBox(
-                height: 3.h,
+                height: 1.7.h,
               ),
               Padding(
                 padding: EdgeInsets.only(

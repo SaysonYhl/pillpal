@@ -24,17 +24,16 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // if (user != null) ...[
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: kErrorBorderColor,
-                    width: 2,
+                    width: 3,
                   ),
                 ),
                 child: CircleAvatar(
-                  radius: 50,
+                  radius: 70,
                   backgroundImage: NetworkImage(
                     user?.photoURL ??
                         'https://images.app.goo.gl/LEQrX3wnxp2FrQny8',
@@ -47,13 +46,6 @@ class ProfilePage extends StatelessWidget {
                 style: const TextStyle(fontSize: 18, color: kTextColor),
               ),
               const SizedBox(height: 20),
-            // ] else ...[
-            //   const Text(
-            //     'No user is signed in',
-            //     style: TextStyle(fontSize: 18, color: kErrorBorderColor),
-            //   ),
-            //   const SizedBox(height: 20),
-            // ],
             ElevatedButton(
                 onPressed: () async {
                   await _globalBloc.removeAllMedicines();
@@ -69,7 +61,6 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
           ],
-          //],
         ),
       ),
     );
