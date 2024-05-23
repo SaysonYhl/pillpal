@@ -93,7 +93,7 @@ class TopContainer extends StatelessWidget {
                 bottom: 1.h,
               ),
               child: Text(
-                'Welcome to PillPal.',
+                'Your PillPal.',
                 style: Theme.of(context).textTheme.labelMedium,
               ),
             ),
