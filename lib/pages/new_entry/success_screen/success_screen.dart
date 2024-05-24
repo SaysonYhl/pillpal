@@ -19,7 +19,7 @@ class _SuccessScreenState extends State<SuccessScreen> {
     Timer(const Duration(milliseconds: 2500), () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
         (route) => false,
       );
     });
@@ -36,8 +36,8 @@ class _SuccessScreenState extends State<SuccessScreen> {
               Text('Medicine added successfully!',
                   style: Theme.of(context).textTheme.displaySmall!.copyWith(
                         color: kPrimaryColor,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.normal,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
                       )),
             ],
           ),

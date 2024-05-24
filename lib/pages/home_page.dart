@@ -46,15 +46,15 @@ class HomePage extends StatelessWidget {
           );
         },
         child: SizedBox(
-          width: 18.w,
-          height: 18.h,
+          width: 20.w,
+          height: 20.h,
           child: Card(
             color: kErrorBorderColor,
             shape: const CircleBorder(),
             child: Icon(
               Icons.add,
               color: kScaffoldColor,
-              size: 40.sp,
+              size: 50.sp,
             ),
           ),
         ),

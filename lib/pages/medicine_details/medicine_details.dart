@@ -46,7 +46,7 @@ class _MedicineDetailsState extends State<MedicineDetails> {
             MainSection(medicine: widget.medicine),
             SizedBox(height: 10.h),
             ExtendedSection(medicine: widget.medicine),
-            Spacer(),
+            const Spacer(),
             SizedBox(
               width: 100.w,
               height: 7.h,
@@ -108,7 +108,7 @@ class _MedicineDetailsState extends State<MedicineDetails> {
                   _globalBloc.removeMedicine(widget.medicine);
                   Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => HomePage()),
+                  MaterialPageRoute(builder: (context) => const HomePage()),
                   (route) => false,
                 );
                 },
@@ -182,7 +182,7 @@ class MainSection extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        makeIcon(7.h,),
+        makeIcon(10.h,),
         SizedBox(
           width: 2.w,
         ),

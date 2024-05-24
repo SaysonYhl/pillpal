@@ -305,7 +305,7 @@ class _NewEntryPageState extends State<NewEntryPage> {
         backgroundColor: kErrorBorderColor,
         content: Text(
           error,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
         duration: const Duration(milliseconds: 2000),
       ),
